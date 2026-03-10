@@ -11,6 +11,7 @@
             --dark: #011627;
             --light: #fdfffc;
             --gray: #f0f0f0;
+            --danger: #e71d36;
         }
 
         * {
@@ -179,20 +180,25 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 200;
+            padding: 1rem;
+            overflow-y: auto;
         }
 
         .modal {
             background: white;
-            width: 90%;
-            max-width: 500px;
+            width: 100%;
+            max-width: 550px;
             border-radius: 12px;
             overflow: hidden;
             animation: slideIn 0.3s ease-out;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes slideIn {
@@ -211,6 +217,7 @@
 
         .modal-body {
             padding: 1.5rem;
+            overflow-y: auto;
         }
 
         .close-btn {
@@ -248,73 +255,101 @@
             color: var(--secondary);
         }
 
+        /* Customization Sections */
         .customization-section {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
         }
 
         .customization-section h4 {
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
             color: var(--dark);
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            font-size: 1.1rem;
         }
 
-        .option-row {
+        .ingredient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ingredient-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            background: white;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
         }
 
-        .option-row label {
-            font-size: 0.95rem;
+        .ingredient-item:hover {
+            background: #fafafa;
         }
 
-        .toggle-container {
+        .ingredient-info {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
         }
 
-        .switch {
+        .ingredient-name {
+            font-weight: 500;
+        }
+
+        .ingredient-meta {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* Custom Checkbox Style */
+        .checkbox-container {
             position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
         }
 
-        .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute;
+        .checkbox-container input {
+            opacity: 0;
             cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 22px;
+            height: 0;
+            width: 0;
         }
 
-        .slider:before {
+        .checkmark {
             position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            top: 0;
+            left: 0;
+            height: 24px;
+            width: 24px;
+            background-color: #eee;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
 
-        input:checked + .slider { background-color: var(--secondary); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: var(--secondary);
+        }
 
-        .quantity-input {
-            width: 60px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 8px;
+            top: 4px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
         }
 
         .total-price {
@@ -322,6 +357,8 @@
             font-weight: 700;
             text-align: right;
             margin-top: 1rem;
+            border-top: 1px dashed #ccc;
+            padding-top: 1rem;
         }
 
         /* Footer */
@@ -359,7 +396,7 @@
     <div class="container" id="menu">
         <h2 class="section-title">Today's Menu</h2>
         <div class="menu-grid" id="menuGrid">
-            <!-- Cards will be injected here by JS -->
+            <!-- Cards injected by JS -->
         </div>
     </div>
 
@@ -384,54 +421,21 @@
                     </div>
                 </div>
 
-                <!-- Ingredients Customization -->
+                <!-- Section 1: Base Ingredients (Remove items) -->
                 <div class="customization-section">
-                    <h4>Ingredients Adjustments</h4>
-                    
-                    <div class="option-row">
-                        <label>Extra Cheese</label>
-                        <div class="toggle-container">
-                            <span>+80 Cal</span>
-                            <label class="switch">
-                                <input type="checkbox" onchange="updateNutrition()" data-cal="80" data-pro="5" data-price="20">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-row">
-                        <label>Extra Chicken</label>
-                        <div class="toggle-container">
-                            <span>+100 Cal</span>
-                            <label class="switch">
-                                <input type="checkbox" onchange="updateNutrition()" data-cal="100" data-pro="20" data-price="40">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-row">
-                        <label>Remove Oil (Healthier)</label>
-                        <div class="toggle-container">
-                            <span>-50 Cal</span>
-                            <label class="switch">
-                                <input type="checkbox" onchange="updateNutrition()" data-cal="-50" data-pro="0" data-price="0">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
+                    <h4>Base Ingredients</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Uncheck items you want to remove (removes calories & price)</p>
+                    <div class="ingredient-list" id="baseIngredientsList">
+                        <!-- Generated by JS -->
                     </div>
                 </div>
 
-                <!-- Allergens/Preferences -->
+                <!-- Section 2: Add-ons (Add items) -->
                 <div class="customization-section">
-                    <h4>Special Instructions</h4>
-                    <div class="option-row">
-                        <label>Spice Level</label>
-                        <select class="quantity-input" style="width: 100px;" id="spiceLevel">
-                            <option value="mild">Mild</option>
-                            <option value="medium">Medium</option>
-                            <option value="hot">Hot</option>
-                        </select>
+                    <h4>Extra Add-ons</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Check items to add (adds calories & price)</p>
+                    <div class="ingredient-list" id="addonsList">
+                        <!-- Generated by JS -->
                     </div>
                 </div>
 
@@ -451,7 +455,17 @@
     </footer>
 
     <script>
-        // Sample Menu Data
+        // --- DATA STRUCTURE ---
+
+        // Global list of possible add-ons
+        const globalAddons = [
+            { id: 'a1', name: 'Extra Cheese', cal: 80, pro: 5, price: 20 },
+            { id: 'a2', name: 'Grilled Chicken', cal: 120, pro: 25, price: 50 },
+            { id: 'a3', name: 'Avocado Slice', cal: 50, pro: 1, price: 30 },
+            { id: 'a4', name: 'Fried Egg', cal: 90, pro: 6, price: 15 }
+        ];
+
+        // Menu items now contain specific ingredients
         const menuItems = [
             {
                 id: 1,
@@ -459,8 +473,13 @@
                 desc: "Juicy grilled chicken patty with fresh veggies.",
                 img: "https://source.unsplash.com/400x300/?burger",
                 basePrice: 120,
-                baseCal: 450,
-                basePro: 25
+                ingredients: [
+                    { name: "Chicken Patty", cal: 200, pro: 20, price: 0 },
+                    { name: "Sesame Bun", cal: 120, pro: 4, price: 0 },
+                    { name: "Mayo", cal: 80, pro: 1, price: 0 },
+                    { name: "Lettuce", cal: 5, pro: 0, price: 0 },
+                    { name: "Tomato Slice", cal: 10, pro: 0, price: 0 }
+                ]
             },
             {
                 id: 2,
@@ -468,8 +487,12 @@
                 desc: "Fresh greens, tomatoes, corn, and low-fat dressing.",
                 img: "https://source.unsplash.com/400x300/?salad",
                 basePrice: 90,
-                baseCal: 150,
-                basePro: 5
+                ingredients: [
+                    { name: "Mixed Greens", cal: 20, pro: 2, price: 0 },
+                    { name: "Corn", cal: 60, pro: 2, price: 0 },
+                    { name: "Tomatoes", cal: 10, pro: 0, price: 0 },
+                    { name: "Dressing", cal: 90, pro: 1, price: 0 }
+                ]
             },
             {
                 id: 3,
@@ -477,88 +500,163 @@
                 desc: "Rice tossed with scrambled eggs and oriental spices.",
                 img: "https://source.unsplash.com/400x300/?fried rice",
                 basePrice: 110,
-                baseCal: 500,
-                basePro: 18
-            },
-            {
-                id: 4,
-                name: "Grilled Sandwich",
-                desc: "Multigrain bread with corn, spinach, and cheese.",
-                img: "https://source.unsplash.com/400x300/?sandwich",
-                basePrice: 80,
-                baseCal: 300,
-                basePro: 12
+                ingredients: [
+                    { name: "White Rice", cal: 250, pro: 4, price: 0 },
+                    { name: "Scrambled Egg", cal: 100, pro: 7, price: 0 },
+                    { name: "Vegetables", cal: 30, pro: 1, price: 0 },
+                    { name: "Soy Sauce", cal: 10, pro: 1, price: 0 }
+                ]
             }
         ];
 
-        let currentItem = {};
+        let currentItem = null;
 
-        // Render Menu
+        // --- RENDER FUNCTIONS ---
+
         function renderMenu() {
             const grid = document.getElementById('menuGrid');
-            grid.innerHTML = menuItems.map(item => `
-                <div class="food-card">
-                    <img src="${item.img}" alt="${item.name}" class="food-img">
-                    <div class="food-info">
-                        <h3 class="food-title">${item.name}</h3>
-                        <p class="food-desc">${item.desc}</p>
-                        <div class="food-footer">
-                            <span class="price">₹${item.basePrice}</span>
-                            <button class="btn" onclick="openModal(${item.id})">Customize</button>
+            grid.innerHTML = menuItems.map(item => {
+                // Calculate base stats for card display
+                const totalCal = item.ingredients.reduce((sum, ing) => sum + ing.cal, 0);
+                const totalPro = item.ingredients.reduce((sum, ing) => sum + ing.pro, 0);
+
+                return `
+                    <div class="food-card">
+                        <img src="${item.img}" alt="${item.name}" class="food-img">
+                        <div class="food-info">
+                            <h3 class="food-title">${item.name}</h3>
+                            <p class="food-desc">${item.desc}</p>
+                            <div style="font-size:0.8rem; color:#888; margin-bottom:8px;">
+                                Base: ${totalCal} Cal | ${totalPro}g Pro
+                            </div>
+                            <div class="food-footer">
+                                <span class="price">₹${item.basePrice}</span>
+                                <button class="btn" onclick="openModal(${item.id})">Customize</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        // Open Modal
+        // --- MODAL LOGIC ---
+
         function openModal(id) {
             currentItem = menuItems.find(item => item.id === id);
-            
-            // Set base values in display
-            document.getElementById('modalTitle').innerText = currentItem.name;
-            document.getElementById('displayCal').innerText = currentItem.baseCal;
-            document.getElementById('displayPro').innerText = currentItem.basePro + "g";
-            document.getElementById('totalPrice').innerText = currentItem.basePrice;
+            if (!currentItem) return;
 
-            // Reset all checkboxes in modal
-            const inputs = document.querySelectorAll('.modal-body input[type="checkbox"]');
-            inputs.forEach(input => input.checked = false);
+            document.getElementById('modalTitle').innerText = currentItem.name;
+
+            // 1. Render Base Ingredients (Checkboxes checked by default)
+            const baseList = document.getElementById('baseIngredientsList');
+            baseList.innerHTML = currentItem.ingredients.map((ing, index) => `
+                <div class="ingredient-item">
+                    <div class="ingredient-info">
+                        <span class="ingredient-name">${ing.name}</span>
+                        <span class="ingredient-meta">${ing.cal} Cal | ${ing.pro}g Pro</span>
+                    </div>
+                    <label class="checkbox-container">
+                        <input type="checkbox" 
+                               checked 
+                               onchange="updateNutrition()"
+                               data-type="base"
+                               data-index="${index}"
+                               data-cal="${ing.cal}" 
+                               data-pro="${ing.pro}" 
+                               data-price="${ing.price}">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `).join('');
+
+            // 2. Render Add-ons (Checkboxes unchecked by default)
+            const addonsList = document.getElementById('addonsList');
+            addonsList.innerHTML = globalAddons.map((addon, index) => `
+                <div class="ingredient-item">
+                    <div class="ingredient-info">
+                        <span class="ingredient-name">${addon.name}</span>
+                        <span class="ingredient-meta">+${addon.cal} Cal | +₹${addon.price}</span>
+                    </div>
+                    <label class="checkbox-container">
+                        <input type="checkbox" 
+                               onchange="updateNutrition()"
+                               data-type="addon"
+                               data-cal="${addon.cal}" 
+                               data-pro="${addon.pro}" 
+                               data-price="${addon.price}">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `).join('');
+
+            // Initial Calculation
+            updateNutrition();
 
             document.getElementById('modalOverlay').style.display = 'flex';
         }
 
-        // Close Modal
         function closeModal() {
             document.getElementById('modalOverlay').style.display = 'none';
+            currentItem = null;
         }
 
-        // Calculate Nutrition & Price Updates
         function updateNutrition() {
-            let totalCal = currentItem.baseCal;
-            let totalPro = currentItem.basePro;
+            let totalCal = 0;
+            let totalPro = 0;
             let totalPrice = currentItem.basePrice;
 
-            const checkboxes = document.querySelectorAll('.modal-body input[type="checkbox"]:checked');
-            
-            checkboxes.forEach(box => {
-                totalCal += parseInt(box.dataset.cal);
-                totalPro += parseInt(box.dataset.pro);
-                totalPrice += parseInt(box.dataset.price);
+            // 1. Get all checkboxes inside modal
+            const allCheckboxes = document.querySelectorAll('.modal-body input[type="checkbox"]');
+
+            allCheckboxes.forEach(box => {
+                if (box.checked) {
+                    // Add values if checked
+                    totalCal += parseInt(box.dataset.cal);
+                    totalPro += parseInt(box.dataset.pro);
+                    totalPrice += parseInt(box.dataset.price);
+                } else {
+                    // Logic for subtraction is implicitly handled because we start at 0
+                    // and only add if checked.
+                    // For base ingredients: if unchecked, we are effectively removing it.
+                    // Since base ingredients start at 0 in this logic loop, we need to ensure 
+                    // we don't subtract for addons that were never added.
+                    
+                    // Wait, logic check:
+                    // I'm iterating and ADDING only if checked.
+                    // For Base Ingredients: They are checked by default, so they are added.
+                    // If user unchecks, they are not added (effectively removed).
+                    // For Addons: They are unchecked by default. If checked, they are added.
+                    
+                    // Problem: totalPrice starts at basePrice.
+                    // If I uncheck a base ingredient, I need to SUBTRACT its price from the base price?
+                    // Usually base ingredients have price 0 relative to the dish (bundled).
+                    // Let's assume base ingredients have price 0 in the data structure above.
+                    
+                    // Let's re-verify logic:
+                    // Loop starts at 0.
+                    // Base Ingredient "Mayo" (Cal 80). Unchecked -> Not added. Total Cal stays lower. Correct.
+                }
             });
 
+            // Update DOM
             document.getElementById('displayCal').innerText = totalCal;
             document.getElementById('displayPro').innerText = totalPro + "g";
             document.getElementById('totalPrice').innerText = totalPrice;
         }
 
-        // Simulate Add to Cart
         function addToCart() {
             const finalCal = document.getElementById('displayCal').innerText;
             const finalPro = document.getElementById('displayPro').innerText;
-            const spice = document.getElementById('spiceLevel').value;
             
-            alert(`Added to Cart!\n\nItem: ${currentItem.name}\nCalories: ${finalCal}\nProtein: ${finalPro}\nSpice: ${spice}`);
+            // Gather removed items for the alert (just for demo feedback)
+            let removed = [];
+            document.querySelectorAll('#baseIngredientsList input:not(:checked)').forEach(item => {
+                let parent = item.closest('.ingredient-item');
+                let name = parent.querySelector('.ingredient-name').innerText;
+                removed.push(name);
+            });
+
+            alert(`Added to Cart!\n\nItem: ${currentItem.name}\nCalories: ${finalCal}\nProtein: ${finalPro}\nRemoved: ${removed.length > 0 ? removed.join(', ') : 'None'}`);
             closeModal();
         }
 
