@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJCET Canteen - Custom Food Order</title>
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --secondary: #2ec4b6;
+            --dark: #011627;
+            --light: #fdfffc;
+            --gray: #f0f0f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--dark);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://source.unsplash.com/1600x900/?healthy food,vegetables');
+            background-size: cover;
+            background-position: center;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+        }
+
+        /* Menu Grid */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: var(--dark);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .food-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: var(--gray);
+        }
+
+        .food-info {
+            padding: 1.5rem;
+        }
+
+        .food-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .food-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #e05a2b;
+        }
+
+        /* Modal (Customization Popup) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .modal {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: var(--dark);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Nutrition Calculator Styles */
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .nutri-box {
+            background: var(--gray);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .nutri-label {
+            font-size: 0.8rem;
+            color: #777;
+            text-transform: uppercase;
+        }
+
+        .nutri-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .customization-section {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .customization-section h4 {
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-row label {
+            font-size: 0.95rem;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .total-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <div class="logo">SJCET <span>Canteen</span></div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#">My Orders</a></li>
+                <li><a href="#">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Eat Smart, Live Healthy</h1>
+        <p>Order delicious food customized exactly to your dietary needs. Track calories, protein, and ingredients instantly.</p>
+    </section>
+
+    <!-- Menu Section -->
+    <div class="container" id="menu">
+        <h2 class="section-title">Today's Menu</h2>
+        <div class="menu-grid" id="menuGrid">
+            <!-- Cards will be injected here by JS -->
+        </div>
+    </div>
+
+    <!-- Customization Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Customize Order</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Live Nutrition Display -->
+                <div class="nutrition-grid">
+                    <div class="nutri-box">
+                        <div class="nutri-label">Calories</div>
+                        <div class="nutri-value" id="displayCal">0</div>
+                    </div>
+                    <div class="nutri-box">
+                        <div class="nutri-label">Protein</div>
+                        <div class="nutri-value" id="displayPro">0g</div>
+                    </div>
+                </div>
+
+                <!-- Ingredients Customization -->
+                <div class="customization-section">
+                    <h4>Ingredients Adjustments</h4>
+                    
+                    <div class="option-row">
+                        <label>Extra Cheese</label>
+                        <div class="toggle-container">
+                            <span>+80 Cal</span>
+                            <label class="switch">
+                                <input type="checkbox" onchange="updateNutrition()" data-cal="80" data-pro="5" data-price="20">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-row">
+                        <label>Extra Chicken</label>
+                        <div class="toggle-container">
+                            <span>+100 Cal</span>
+                            <label class="switch">
+                                <input type="checkbox" onchange="updateNutrition()" data-cal="100" data-pro="20" data-price="40">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-row">
+                        <label>Remove Oil (Healthier)</label>
+                        <div class="toggle-container">
+                            <span>-50 Cal</span>
+                            <label class="switch">
+                                <input type="checkbox" onchange="updateNutrition()" data-cal="-50" data-pro="0" data-price="0">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Allergens/Preferences -->
+                <div class="customization-section">
+                    <h4>Special Instructions</h4>
+                    <div class="option-row">
+                        <label>Spice Level</label>
+                        <select class="quantity-input" style="width: 100px;" id="spiceLevel">
+                            <option value="mild">Mild</option>
+                            <option value="medium">Medium</option>
+                            <option value="hot">Hot</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="total-price">
+                    Total: ₹<span id="totalPrice">0</span>
+                </div>
+
+                <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="addToCart()">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 SJCET Canteen. All Rights Reserved.</p>
+        <p>Designed for Student Health & Wellness</p>
+    </footer>
+
+    <script>
+        // Sample Menu Data
+        const menuItems = [
+            {
+                id: 1,
+                name: "Chicken Burger",
+                desc: "Juicy grilled chicken patty with fresh veggies.",
+                img: "https://source.unsplash.com/400x300/?burger",
+                basePrice: 120,
+                baseCal: 450,
+                basePro: 25
+            },
+            {
+                id: 2,
+                name: "Veggie Salad Bowl",
+                desc: "Fresh greens, tomatoes, corn, and low-fat dressing.",
+                img: "https://source.unsplash.com/400x300/?salad",
+                basePrice: 90,
+                baseCal: 150,
+                basePro: 5
+            },
+            {
+                id: 3,
+                name: "Egg Fried Rice",
+                desc: "Rice tossed with scrambled eggs and oriental spices.",
+                img: "https://source.unsplash.com/400x300/?fried rice",
+                basePrice: 110,
+                baseCal: 500,
+                basePro: 18
+            },
+            {
+                id: 4,
+                name: "Grilled Sandwich",
+                desc: "Multigrain bread with corn, spinach, and cheese.",
+                img: "https://source.unsplash.com/400x300/?sandwich",
+                basePrice: 80,
+                baseCal: 300,
+                basePro: 12
+            }
+        ];
+
+        let currentItem = {};
+
+        // Render Menu
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid');
+            grid.innerHTML = menuItems.map(item => `
+                <div class="food-card">
+                    <img src="${item.img}" alt="${item.name}" class="food-img">
+                    <div class="food-info">
+                        <h3 class="food-title">${item.name}</h3>
+                        <p class="food-desc">${item.desc}</p>
+                        <div class="food-footer">
+                            <span class="price">₹${item.basePrice}</span>
+                            <button class="btn" onclick="openModal(${item.id})">Customize</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open Modal
+        function openModal(id) {
+            currentItem = menuItems.find(item => item.id === id);
+            
+            // Set base values in display
+            document.getElementById('modalTitle').innerText = currentItem.name;
+            document.getElementById('displayCal').innerText = currentItem.baseCal;
+            document.getElementById('displayPro').innerText = currentItem.basePro + "g";
+            document.getElementById('totalPrice').innerText = currentItem.basePrice;
+
+            // Reset all checkboxes in modal
+            const inputs = document.querySelectorAll('.modal-body input[type="checkbox"]');
+            inputs.forEach(input => input.checked = false);
+
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        // Calculate Nutrition & Price Updates
+        function updateNutrition() {
+            let totalCal = currentItem.baseCal;
+            let totalPro = currentItem.basePro;
+            let totalPrice = currentItem.basePrice;
+
+            const checkboxes = document.querySelectorAll('.modal-body input[type="checkbox"]:checked');
+            
+            checkboxes.forEach(box => {
+                totalCal += parseInt(box.dataset.cal);
+                totalPro += parseInt(box.dataset.pro);
+                totalPrice += parseInt(box.dataset.price);
+            });
+
+            document.getElementById('displayCal').innerText = totalCal;
+            document.getElementById('displayPro').innerText = totalPro + "g";
+            document.getElementById('totalPrice').innerText = totalPrice;
+        }
+
+        // Simulate Add to Cart
+        function addToCart() {
+            const finalCal = document.getElementById('displayCal').innerText;
+            const finalPro = document.getElementById('displayPro').innerText;
+            const spice = document.getElementById('spiceLevel').value;
+            
+            alert(`Added to Cart!\n\nItem: ${currentItem.name}\nCalories: ${finalCal}\nProtein: ${finalPro}\nSpice: ${spice}`);
+            closeModal();
+        }
+
+        // Initialize
+        renderMenu();
+
+    </script>
+</body>
+</html>
